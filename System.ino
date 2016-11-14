@@ -1,61 +1,76 @@
 #include "System.h"
 
-// Thread variables
-ThreadController System;
+ThreadController SystemController;
 
-Thread heartBeat;
-Thread serialDebug;
+Thread thread_stabilizer;
 
-// General variables
-bool ledState = false;
+PID pidRoll(PID_ROLL_KP, PID_ROLL_KI, PID_ROLL_KD, PID_ROLL_I_LIMIT);
+PID pidYaw(PID_YAW_KP, PID_YAW_KI, PID_YAW_KD, PID_YAW_I_LIMIT);
 
-void system_init(){
-	// Setup Pins
-	pinMode(PIN_LED, OUTPUT);
+IMU* imu;
 
-	// Serial
-	Serial.begin(SERIAL_BAUDRATE);
-	while(!Serial);
-
-	// Setup heartBeat Thread
-	heartBeat.onRun(heartBeat_callback);
-	heartBeat.setInterval(HEART_BEAT_INTERVAL);
-
-	// Setup serialDebug Thread
-	serialDebug.onRun(serialDebug_callback);
-	serialDebug.setInterval(SERIAL_DEBUG_INTERVAL);
-
-	// Disable serialDebug Thread
-	serialDebug.enabled = SERIAL_ENABLED;
-
-	// Add Threads to System
-	System.add(&heartBeat);
-	System.add(&serialDebug);
-
+void System::init(){
 	// Startup Message
-	LOG("\n\nUP! "); LOG(PROJECT_NAME); LOG("\n");
+	LOG(">> UP! "); LOG(PROJECT_NAME); LOG("\n");
+
+	// Init IMU Thread
+	imu = new IMU();
+	imu->init();
+	imu->setInterval(IMU_ACQUIRE_INTERVAL);
+	imu->enabled = IMU_ACQUIRE_ENABLED;
+
+	// Initialize Stabilizer Thread
+	thread_stabilizer.setInterval(STABILIZER_INTERVAL);
+	thread_stabilizer.onRun(thread_stabilizer_callback);
+	thread_stabilizer.enabled = STABILIZER_ENABLED;
+
+	// System
+	SystemController.add(imu);
+	SystemController.add(&thread_stabilizer);
 }
 
-void system_run(){
-	System.run();
+void System::run(){
+	SystemController.run();
 }
 
-void heartBeat_callback(){
-	// Blinking
-	ledState = !ledState;
-	digitalWrite(PIN_LED, ledState);
-}
+void thread_stabilizer_callback(){
+	// // Find out dt (delta time)
+	// unsigned long now = millis();
+	// float dt = (now - lastComputeTime) / 1000.0;
+	// lastComputeTime = now;
 
-void serialDebug_callback(){
-	if(!Serial.available())
-		return;
+	// if(Drone::state != ARMED){
+	// 	pidYaw.reset();
+	// 	pidRoll.reset();
+	// 	pidPitch.reset();
 
-	char cmd = Serial.read();
+	// 	Motors::stop();
+	// 	return;
+	// }
 
-	if(cmd == 'p'){
-		LOG("$ Ping back\n");
-	}else if(cmd == 'i'){
-		LOG("$ Toggling DEBUG in IMU\n");
-		threadDebug.enabled = !threadDebug.enabled;
-	}
+	// // Check if dt is good to go
+	// if(dt <= 0.0 || dt >= 0.2){
+	// 	LOG(">> dt too high! "); LOG(dt); LOG("\n");
+	// 	return;
+	// }
+
+	// pidYaw.addNewSample(Drone::ypr[2]);
+	// pidRoll.addNewSample(Drone::ypr[2]);
+	// pidPitch.addNewSample(Drone::ypr[1]);
+
+	// float outYaw = pidYaw.process(dt);
+	// float outRoll = pidRoll.process(dt);
+	// float outPitch = pidPitch.process(dt);
+
+	// // Iterate and distribute power to propelers
+	// for(int i = 0; i < PROP_COUNT; i++){
+
+	// 	powers[i] = outPitch * Drone::props[i][PROP_Y_W] +
+	// 				outRoll * Drone::props[i][PROP_X_W] +
+	// 				outYaw * Drone::props[i][PROP_DIR];
+
+	// }
+
+	// // Output Motor powers
+	// Motors::setPower(powers);
 }

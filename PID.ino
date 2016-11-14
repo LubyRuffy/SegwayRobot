@@ -24,7 +24,7 @@ double PID::process(float deltaTime){
 	
 	P = error * kP;
 	
-	I = I + (error * kI) * deltaTime;
+	I += (error * kI) * deltaTime;
 	I = (I >  iLimit) ?  iLimit : I;
 	I = (I < -iLimit) ? -iLimit : I;
 

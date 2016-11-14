@@ -1,6 +1,9 @@
 #ifndef PID_H
 #define PID_H
 
+/** Configs **/
+#include "config.h"
+
 class PID{
 public:
 	double error;
@@ -14,13 +17,9 @@ public:
 	long lastProcess;
 	
 	PID(double _kP, double _kI, double _kD, double _iLimit);
-
 	void reset();
-	
 	void addNewSample(double _sample);
-	
 	void setSetPoint(double _setPoint);
-	
 	double process(float deltaTime);
 };
 

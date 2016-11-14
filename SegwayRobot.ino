@@ -14,20 +14,19 @@
 
 /** Modules **/
 #include "System.h"
+#include "Debug.h"
 #include "Radio.h"
 #include "IMU.h"
 #include "Motors.h"
 #include "PID.h"
-#include "Attitude.h"
-
 
 void setup(){
-	system_init();
+	System::init();
+	Debug::init();
+	Motors::init();
 	// Radio::init();
-	// Motors::init();
-	Attitude::init();
 }
 
 void loop(){
-	system_run();
+	System::run();
 }

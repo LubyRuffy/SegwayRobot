@@ -11,19 +11,20 @@
 #include <ThreadController.h>
 
 /** Modules **/
-#include "Radio.h"
 #include "IMU.h"
-#include "Motors.h"
 
-extern ThreadController System;
+extern ThreadController SystemController;
+extern Thread thread_stabilizer;
 
-extern Thread heartBeat;
-extern Thread serialDebug;
-extern Thread batteryChecker;
+extern IMU* imu;
 
-extern void system_init();
-extern void system_run();
-extern void heartBeat_callback();
-extern void serialDebug_callback();
+void thread_stabilizer_callback();
+
+class System{
+
+public:
+	static void init();
+	static void run();
+};
 
 #endif // SYSTEM_H

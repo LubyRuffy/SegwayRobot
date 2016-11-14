@@ -3,7 +3,7 @@
 bool IMU::init(){
 	bool devStatus;
 
-	LOG("IMU::init\n");
+	LOG(">> IMU::init\n");
 
 	Wire.begin();
 	TWBR = 24; // 400kHz I2C clock
@@ -11,7 +11,7 @@ bool IMU::init(){
 	mpu.initialize();
 
 	if(!mpu.testConnection()){
-		LOG("MPU6050 connection failed\n");
+		LOG(">> MPU6050 connection failed\n");
 		return false;
 	}
 
@@ -54,7 +54,7 @@ bool IMU::shouldRun(unsigned long time){
 	// Turn ON/OFF DMP (Digital Motion Processing)
 	if(enabled != dmpEnabled){
 		mpu.setDMPEnabled(enabled);
-		LOG( enabled ? "$IMU is [ON]\n" : "$IMU is [OFF]\n" );
+		LOG( enabled ? ">> IMU is [ON]\n" : ">> IMU is [OFF]\n" );
 		dmpEnabled = enabled;
 	}
 
@@ -84,7 +84,9 @@ void IMU::run(){
 		ypr[1] = ypr[1] * 180/M_PI;
 		ypr[2] = ypr[2] * 180/M_PI;
 
-		newData = true;
+		// LOG(ypr[0]); LOG("\t");
+		// LOG(ypr[1]); LOG("\t");
+		// LOG(ypr[2]); LOG("\n");
 	}
 
 	if (interruptStatus & 0x10) {

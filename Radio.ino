@@ -24,9 +24,10 @@ void Radio::init(){
 	// Setup receiveData Thread
 	exchangeData.onRun(exchangeData_callback);
 	exchangeData.setInterval(RADIO_RECEIVE_INTERVAL);
+	exchangeData.enabled = RADIO_RECEIVE_ENABLED;
 
 	// Add Thread to System
-	System.add(&exchangeData);
+	SystemController.add(&exchangeData);
 }
 
 void exchangeData_callback(){

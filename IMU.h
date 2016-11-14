@@ -3,7 +3,6 @@
 
 /** Configs **/
 #include "config.h"
-#include "pinout.h"
 
 /** Libraries **/
 #include <Arduino.h>
@@ -12,10 +11,6 @@
 #include <I2Cdev.h>
 #include <MPU6050_6Axis_MotionApps20.h>
 #include <math.h>
-
-/** Modules **/
-#include "System.h"
-
 
 class IMU: public Thread{
 private:
@@ -31,19 +26,15 @@ private:
 	uint8_t interruptStatus;
 
 public:
-	bool newData;
-
-	bool init();
-
-	// Checks if the Thread should run (Time && Enabled && FIFO buffer)
-	bool shouldRun(unsigned long time);
-
-	// Override the usual Run method
-	void run();
-
 	Quaternion q;
 	VectorFloat gravity;
 	float ypr[3];
+
+	bool init();
+	// Checks if the Thread should run (Time && Enabled && FIFO buffer)
+	bool shouldRun(unsigned long time);
+	// Override the usual Run method
+	void run();
 };
 
 #endif // IMU_H
