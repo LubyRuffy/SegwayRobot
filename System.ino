@@ -4,14 +4,19 @@ ThreadController SystemController;
 
 Thread thread_stabilizer;
 
+IMU* imu;
+
 PID pidRoll(PID_ROLL_KP, PID_ROLL_KI, PID_ROLL_KD, PID_ROLL_I_LIMIT);
 PID pidYaw(PID_YAW_KP, PID_YAW_KI, PID_YAW_KD, PID_YAW_I_LIMIT);
 
-IMU* imu;
+unsigned long lastComputeTime;
 
 void System::init(){
 	// Startup Message
 	LOG(">> UP! "); LOG(PROJECT_NAME); LOG("\n");
+
+	pidRoll.reset();
+	pidYaw.reset();
 
 	// Init IMU Thread
 	imu = new IMU();
@@ -34,43 +39,32 @@ void System::run(){
 }
 
 void thread_stabilizer_callback(){
-	// // Find out dt (delta time)
-	// unsigned long now = millis();
-	// float dt = (now - lastComputeTime) / 1000.0;
-	// lastComputeTime = now;
+	// Find out dt (delta time)
+	unsigned long now = millis();
+	float dt = (now - lastComputeTime) / 1000.0;
+	lastComputeTime = now;
 
-	// if(Drone::state != ARMED){
-	// 	pidYaw.reset();
-	// 	pidRoll.reset();
-	// 	pidPitch.reset();
+	// Check if dt is good to go
+	if((dt <= 0.0) || (dt >= 0.2)){
+		LOG(">> dt too high! "); LOG(dt); LOG("\n");
+		return;
+	}
 
-	// 	Motors::stop();
-	// 	return;
-	// }
+	pidRoll.setSetPoint(0);
+	pidYaw.setSetPoint(0);
 
-	// // Check if dt is good to go
-	// if(dt <= 0.0 || dt >= 0.2){
-	// 	LOG(">> dt too high! "); LOG(dt); LOG("\n");
-	// 	return;
-	// }
+	pidRoll.addNewSample(imu->ypr[0]);
+	pidYaw.addNewSample(imu->ypr[2]);
 
-	// pidYaw.addNewSample(Drone::ypr[2]);
-	// pidRoll.addNewSample(Drone::ypr[2]);
-	// pidPitch.addNewSample(Drone::ypr[1]);
+	float outRoll = pidRoll.process(dt);
+	float outYaw = pidYaw.process(dt);
 
-	// float outYaw = pidYaw.process(dt);
-	// float outRoll = pidRoll.process(dt);
-	// float outPitch = pidPitch.process(dt);
+	// Iterate and distribute power to motors
+	int powers[MOTOR_NUM_OF_MOTORS];
+	for(int i=0; i<MOTOR_NUM_OF_MOTORS; i++){
+		powers[i] = (int) (outRoll + outYaw);
+	}
 
-	// // Iterate and distribute power to propelers
-	// for(int i = 0; i < PROP_COUNT; i++){
-
-	// 	powers[i] = outPitch * Drone::props[i][PROP_Y_W] +
-	// 				outRoll * Drone::props[i][PROP_X_W] +
-	// 				outYaw * Drone::props[i][PROP_DIR];
-
-	// }
-
-	// // Output Motor powers
-	// Motors::setPower(powers);
+	// Output Motor powers
+	Motors::setPower(powers);
 }
