@@ -19,14 +19,17 @@ extern Thread exchangeData;
 
 extern void exchangeData_callback();
 
-class Radio{
-
+class Radio: public Thread{
+private:
+	// RF24 nRF24L01(PIN_RADIO_CE, PIN_RADIO_CSN);
 public:
-	static uint8_t dataPackage[RADIO_DATA_PACKAGE_SIZE];
-
-	static void init();
-	static bool isAvailable();
-	static bool receiveData();
+	uint8_t dataPackage[RADIO_DATA_PACKAGE_SIZE];
+	bool init();
+	// Checks if the Thread should run (Time && Enabled && FIFO buffer)
+	bool shouldRun(unsigned long time);
+	// Override the usual Run method
+	void run();
+	bool isAvailable();
 };
 
 

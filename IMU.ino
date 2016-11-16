@@ -83,10 +83,6 @@ void IMU::run(){
 		ypr[0] = ypr[0] * 180/M_PI;
 		ypr[1] = ypr[1] * 180/M_PI;
 		ypr[2] = ypr[2] * 180/M_PI;
-
-		// LOG(ypr[0]); LOG("\t");
-		// LOG(ypr[1]); LOG("\t");
-		// LOG(ypr[2]); LOG("\n");
 	}
 
 	if (interruptStatus & 0x10) {

@@ -5,6 +5,7 @@ ThreadController SystemController;
 Thread thread_stabilizer;
 
 IMU* imu;
+Radio* receiver;
 
 PID pidRoll(PID_ROLL_KP, PID_ROLL_KI, PID_ROLL_KD, PID_ROLL_I_LIMIT);
 PID pidYaw(PID_YAW_KP, PID_YAW_KI, PID_YAW_KD, PID_YAW_I_LIMIT);
@@ -24,6 +25,12 @@ void System::init(){
 	imu->setInterval(IMU_ACQUIRE_INTERVAL);
 	imu->enabled = IMU_ACQUIRE_ENABLED;
 
+	// Init Radio Thread
+	receiver = new Radio();
+	receiver->init();
+	receiver->setInterval(RADIO_RECEIVE_INTERVAL);
+	receiver->enabled = RADIO_RECEIVE_ENABLED;
+
 	// Initialize Stabilizer Thread
 	thread_stabilizer.setInterval(STABILIZER_INTERVAL);
 	thread_stabilizer.onRun(thread_stabilizer_callback);
@@ -31,6 +38,7 @@ void System::init(){
 
 	// System
 	SystemController.add(imu);
+	SystemController.add(receiver);
 	SystemController.add(&thread_stabilizer);
 }
 

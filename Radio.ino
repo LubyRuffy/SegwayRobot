@@ -1,15 +1,11 @@
 #include "Radio.h"
 
-Thread exchangeData;
-
 RF24 nRF24L01(PIN_RADIO_CE, PIN_RADIO_CSN);
 
-uint8_t Radio::dataPackage[RADIO_DATA_PACKAGE_SIZE];
-
-void Radio::init(){
+bool Radio::init(){
 	// Initializes package
 	for(int i = 0; i < RADIO_DATA_PACKAGE_SIZE; i++){
-		Radio::dataPackage[i] = 0;
+		dataPackage[i] = 0;
 	}
 
 	// Begin operation of the chip
@@ -21,28 +17,28 @@ void Radio::init(){
 	// Start listening on the pipes opened for reading
 	nRF24L01.startListening();
 
-	// Setup receiveData Thread
-	exchangeData.onRun(exchangeData_callback);
-	exchangeData.setInterval(RADIO_RECEIVE_INTERVAL);
-	exchangeData.enabled = RADIO_RECEIVE_ENABLED;
-
-	// Add Thread to System
-	SystemController.add(&exchangeData);
-}
-
-void exchangeData_callback(){
-	if(Radio::isAvailable()){
-		Radio::receiveData();
-	}
+	return true;
 }
 
 bool Radio::isAvailable(){
 	return nRF24L01.available();
 }
 
-bool Radio::receiveData(){
-	// Read the received packet
-	bool done = false;
-	done = nRF24L01.read(dataPackage, sizeof(dataPackage));
-	return done;
+bool Radio::shouldRun(unsigned long time){
+	if(!Thread::shouldRun(time))
+		return false;
+
+	if(!nRF24L01.available())
+		return false;
+
+	return true;
+}
+
+void Radio::run(){
+	if (nRF24L01.available()) {
+		runned();
+		// Read the received packet
+		bool done = false;
+		done = nRF24L01.read(dataPackage, sizeof(dataPackage));
+	}
 }
