@@ -25,16 +25,19 @@ private:
 	uint8_t fifoCount;
 	uint8_t interruptStatus;
 
-public:
 	Quaternion q;
 	VectorFloat gravity;
 	float ypr[3];
-
+public:
 	bool init();
 	// Checks if the Thread should run (Time && Enabled && FIFO buffer)
 	bool shouldRun(unsigned long time);
 	// Override the usual Run method
 	void run();
+	// Get methods
+	float getYaw();
+	float getPitch();
+	float getRoll();
 };
 
 #endif // IMU_H

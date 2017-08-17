@@ -60,7 +60,7 @@ void thread_serialDebug_callback(){
 
 void thread_IMUDebug_callback(){
 	LOG(">> YPR:\t"); 
-	LOG(imu->ypr[0]); LOG("\t");
-	LOG(imu->ypr[1]); LOG("\t");
-	LOG(imu->ypr[2]); LOG("\n");
+	LOG(imu->getYaw()); LOG("\t");
+	LOG(imu->getPitch()); LOG("\t");
+	LOG(imu->getRoll()); LOG("\n");
 }

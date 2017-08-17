@@ -23,7 +23,7 @@ class Radio: public Thread{
 private:
 	// RF24 nRF24L01(PIN_RADIO_CE, PIN_RADIO_CSN);
 public:
-	uint8_t dataPackage[RADIO_DATA_PACKAGE_SIZE];
+	uint8_t dataPackage[RADIO_DATA_PACKAGE_SIZE]; // change to private and create a function to return
 	bool init();
 	// Checks if the Thread should run (Time && Enabled && FIFO buffer)
 	bool shouldRun(unsigned long time);

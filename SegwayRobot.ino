@@ -24,7 +24,6 @@ void setup(){
 	System::init();
 	Debug::init();
 	Motors::init();
-	// Radio::init();
 }
 
 void loop(){

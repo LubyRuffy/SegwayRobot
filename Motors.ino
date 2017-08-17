@@ -7,9 +7,9 @@ int pin_motorDirB[MOTOR_NUM_OF_MOTORS];
 void Motors::init(){
 	// Initialize variables
 	pin_motorPwm[0] = PIN_MOTOR_FRONT_PWM;
+	pin_motorPwm[1] = PIN_MOTOR_REAR_PWM;
 	pin_motorDirA[0] = PIN_MOTOR_FRONT_DIR_A;
 	pin_motorDirB[0] = PIN_MOTOR_FRONT_DIR_B;
-	pin_motorPwm[1] = PIN_MOTOR_REAR_PWM;
 	pin_motorDirA[1] = PIN_MOTOR_REAR_DIR_A;
 	pin_motorDirB[1] = PIN_MOTOR_REAR_DIR_B;
 
@@ -37,10 +37,13 @@ void Motors::setPower(int power[MOTOR_NUM_OF_MOTORS]){
 
 		// Check power is out range
 		power[i] = abs(power[i]);
-		power[i] = (power[i] < MOTOR_OUTPUT_MIN) ? MOTOR_OUTPUT_MIN : power[i];
+		// power[i] = (power[i] < MOTOR_OUTPUT_MIN) ? MOTOR_OUTPUT_MIN : power[i];
+		power[i] = (power[i] < MOTOR_OUTPUT_MIN) ? 0 : power[i];
 		power[i] = (power[i] > MOTOR_OUTPUT_MAX) ? MOTOR_OUTPUT_MAX : power[i];
 
 		// Write PWM
-		analogWrite(pin_motorPwm[i], power[i]);
+		// analogWrite(pin_motorPwm[i], power[i]);
 	}
+		analogWrite(pin_motorPwm[0], 0.8*power[0]);
+		analogWrite(pin_motorPwm[1], power[1]);
 }

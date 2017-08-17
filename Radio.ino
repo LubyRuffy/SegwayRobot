@@ -28,8 +28,8 @@ bool Radio::shouldRun(unsigned long time){
 	if(!Thread::shouldRun(time))
 		return false;
 
-	if(!nRF24L01.available())
-		return false;
+	// if(!nRF24L01.available())
+	// 	return false;
 
 	return true;
 }

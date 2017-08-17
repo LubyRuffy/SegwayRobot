@@ -90,3 +90,12 @@ void IMU::run(){
 		mpu.resetFIFO();
 	}
 }
+float IMU::getYaw(){
+	return ypr[0];
+}
+float IMU::getPitch(){
+	return ypr[1];
+}
+float IMU::getRoll(){
+	return ypr[2];
+}

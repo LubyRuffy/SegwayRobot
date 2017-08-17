@@ -58,21 +58,35 @@ void thread_stabilizer_callback(){
 		return;
 	}
 
+	Serial.print(receiver->dataPackage[0]); Serial.print(" - "); Serial.println(receiver->dataPackage[1]);
+
 	pidRoll.setSetPoint(0);
 	pidYaw.setSetPoint(0);
 
-	pidRoll.addNewSample(imu->ypr[0]);
-	pidYaw.addNewSample(imu->ypr[2]);
+	pidRoll.addNewSample(imu->getRoll());
+	pidYaw.addNewSample(imu->getYaw());
 
 	float outRoll = pidRoll.process(dt);
 	float outYaw = pidYaw.process(dt);
 
 	// Iterate and distribute power to motors
 	int powers[MOTOR_NUM_OF_MOTORS];
-	for(int i=0; i<MOTOR_NUM_OF_MOTORS; i++){
-		powers[i] = (int) (outRoll + outYaw);
-	}
+	// for(int i=0; i<MOTOR_NUM_OF_MOTORS; i++){
+	// 	// powers[i] = (int) (outRoll + outYaw);
+	// 	// powers[i] = (int) (outRoll);
+	// 	powers[i] = (int) (outYaw);
+	// }
+	powers[0] = (int) (outRoll);
+	powers[1] = (int) (outRoll);
+	// powers[0] = (int) (outYaw);
+	// powers[1] = (int) (-outYaw);
 
 	// Output Motor powers
+	powers[0] = 0;
+	powers[1] = 0;
+	// if(receiver->dataPackage[0] == 1)
+	// 	powers[0] = 200;
+	// if(receiver->dataPackage[1] == 3)	
+	// 	powers[1] = 200;
 	Motors::setPower(powers);
 }
